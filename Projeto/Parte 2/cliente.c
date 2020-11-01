@@ -2,16 +2,18 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <string.h>
+#include <ctype.h>
 #include "locadora.h"
 #include "locacao.h"
 #include "cliente.h"
 #include "veiculo.h"
 
+// Função para cadastrar novos clientes
 void novoCliente(struct clientes cliente[], int *qnt_cliente, int *qnt_max_cliente){
 	int i;
-	char cpf[15], name[15], cnh[15], telefone[20];
+	char cpf[15], name[100], cnh[15], telefone[20];
 
-	// Verifica se existe espaÃ§o e aloca caso nÃ£o tenha
+	// Verifica se existe espaço e aloca caso não tenha
 	if (*qnt_max_cliente - *qnt_cliente <= 10){
 		reallocSizeCliente(cliente, *qnt_max_cliente + 20);
 		(*qnt_max_cliente) = (*qnt_max_cliente) + 20;
@@ -25,24 +27,28 @@ void novoCliente(struct clientes cliente[], int *qnt_cliente, int *qnt_max_clien
 	}
 
 	// Obtem o CPF
-	printf("Insira o CPF (apenas numeros): ");
+	printf("Insira o CPF (apenas números): ");
 	fflush(stdin);
 	gets(cpf);
-	// Verifica a existÃªncia do cliente
+	// Verifica a existência do cliente
 	if (verifyExistCliente(cliente, cpf, *qnt_cliente) == 1){
-		printf("Cliente ja cadastrado");
+		// Cliente já está cadastrado
+		clearScreen();
+		printf("Cliente já cadastrado\n\n");
 	} else{
+		// Cliente não está cadastrado
+		// Coleta os dados e armazena
 		strcpy(cliente[i].cpf, cpf);
 
 		printf("Insira o nome: ");
 		gets(name);
 		strcpy(cliente[i].name, name);
 
-		printf("Insira a CNH (apenas numeros): ");
+		printf("Insira a CNH (apenas números): ");
 		gets(cnh);
 		strcpy(cliente[i].cnh, cnh);
 		
-		printf("Insira o telefone (apenas numeros): ");
+		printf("Insira o telefone (apenas números): ");
 		gets(telefone);
 		strcpy(cliente[i].telefone, telefone);
 
@@ -53,16 +59,18 @@ void novoCliente(struct clientes cliente[], int *qnt_cliente, int *qnt_max_clien
 	}
 }
 
+// Função para editar clientes
 void editarCliente(struct clientes cliente[], int *qnt_cliente, int *qnt_max_cliente){
 	int i;
 	int found = 0;
-	char cpf[15], name[15], cnh[15], telefone[20];
+	char cpf[15], name[100], cnh[15], telefone[20];
 
+	// Obtem o CPF
 	printf("Insira o CPF do cliente a ser alterado: ");
 	fflush(stdin);
 	gets(cpf);
 
-	// Verifica a existÃªncia do cliente
+	// Verifica a existência do cliente
 	for (i=0; i<*qnt_cliente; i++){
 		if (strcmp(cliente[i].cpf, cpf) == 0){
 			found = 1;
@@ -73,7 +81,7 @@ void editarCliente(struct clientes cliente[], int *qnt_cliente, int *qnt_max_cli
 	// Altera os dados do cliente ou exibe o erro
 	if (found == 0){
 		clearScreen();
-		printf("Cliente nÃ£o encontrado\n");
+		printf("Cliente não encontrado\n\n");
 	}  else{
 		strcpy(cliente[i].cpf, cpf);
 
@@ -94,16 +102,18 @@ void editarCliente(struct clientes cliente[], int *qnt_cliente, int *qnt_max_cli
 	}
 }
 
+// Função para excluir um cliente
 void excluirCliente(struct clientes cliente[], int *qnt_cliente, int *qnt_max_cliente, int *qnt_cliente_excluido){
 	int i;
 	int found = 0;
 	char cpf[15], conf;
 
-	printf("Insira o CPF do cliente a ser excluido: ");
+	// Obtem o CPF
+	printf("Insira o CPF do cliente a ser excluído: ");
 	fflush(stdin);
 	gets(cpf);
 
-	// Verifica a existÃªncia do cliente
+	// Verifica a existência do cliente
 	for (i=0; i<*qnt_cliente; i++){
 		if (strcmp(cliente[i].cpf, cpf) == 0){
 			found = 1;
@@ -112,9 +122,11 @@ void excluirCliente(struct clientes cliente[], int *qnt_cliente, int *qnt_max_cl
 	}
 
 	if (found == 0){
+		// Cliente não encontrado
 		clearScreen();
-		printf("Cliente nÃ£o encontrado\n\n");
+		printf("Cliente não encontrado\n\n");
 	}  else{
+		// Confirmação adicional
 		printf("Tem certeja que deseja excluir o cliente de CPF %s (S/N): ", cliente[i].cpf);
 		scanf(" %c", &conf);
 		clearScreen();
@@ -130,16 +142,19 @@ void excluirCliente(struct clientes cliente[], int *qnt_cliente, int *qnt_max_cl
 	}
 }
 
-void consultarCliente(struct clientes cliente[], int *qnt_cliente, int *qnt_cliente_excluido, int *qnt_max_cliente, int *qnt_veiculo, int *qnt_max_veiculo){
-	int i;
+// Função para consultar o cliente
+void consultarCliente(struct clientes cliente[], struct veiculos veiculo[] ,int *qnt_cliente, int *qnt_max_cliente, int *qnt_veiculo, int *qnt_max_veiculo){
+	int i, j;
+	int found2 = 0;
 	int found = 0;
-	char cpf[15], name[15], cnh[15], telefone[20];
+	char cpf[15], name[100], cnh[15], telefone[20];
 
+	// Obtem o CPF
 	printf("Insira o CPF do cliente a ser consultado: ");
 	fflush(stdin);
 	gets(cpf);
 
-	// Verifica a existÃªncia do cliente
+	// Verifica a existência do cliente
 	for (i=0; i<*qnt_cliente; i++){
 		if (strcmp(cliente[i].cpf, cpf) == 0){
 			found = 1;
@@ -148,20 +163,39 @@ void consultarCliente(struct clientes cliente[], int *qnt_cliente, int *qnt_clie
 	}
 
 	if (found == 0){
+		// Cliente não encontrado
 		clearScreen();
-		printf("Cliente nÃ£o encontrado\n\n");
-	}  else{
-		
+		printf("Cliente não encontrado\n\n");
+	} else{
+		// Exibe os dados do cliente
+		printf("Nome: %s\n", cliente[i].name);
+		printf("CPF: %s\n", cliente[i].cpf);
+		printf("CNH: %s\n", cliente[i].cnh);
+		printf("Telefone: %s\n", cliente[i].telefone);
+			
+		// Procura e exibe os dados das locações do cliente (se houver)
+		for (j=0; j<*qnt_veiculo; j++){
+			if (strcmp(veiculo[j].cpfAluguel, cpf) == 0){
+				found2++;
+				if (found2 == 1){
+					printf("\nO cliente possui os seguintes veículos alugados:\n");
+				}
+				printf(" - %s %s %d\n", veiculo[j].marca, veiculo[j].modelo, veiculo[j].ano);
+			}
+		}
+		if (found2 == 0){
+			printf("O cliente não possui veículos alugados");
+		}
+		printf("\n\n");
 	}
 }
 
-void listarCliente(struct clientes cliente[], int *qnt_cliente, int *qnt_max_cliente, int *qnt_cliente_excluido){
-	int i, contExibido;
-	contExibido = 0;
+// Função para listar todos clientes
+void listarCliente(struct clientes cliente[], int *qnt_cliente){
+	int i;
 	clearScreen();
 
-
-	for (i=0; i<(*qnt_cliente+ *qnt_cliente_excluido); i++){
+	for (i=0; i<(*qnt_cliente); i++){
 		if (strlen(cliente[i].cpf) > 2){
 			printf("Nome: %s\n", cliente[i].name);
 			printf("CPF: %s\n", cliente[i].cpf);

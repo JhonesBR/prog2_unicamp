@@ -2,24 +2,22 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <string.h>
+#include <ctype.h>
 #include "locadora.h"
 #include "locacao.h"
 #include "cliente.h"
 #include "veiculo.h"
 
-void cadastrarVeiculo(struct veiculos veiculo[], int *qnt_veiculo, int *qnt_max_veiculo){
+// Função para cadastrar novos veículos
+void novoVeiculo(struct veiculos veiculo[], int *qnt_veiculo, int *qnt_max_veiculo){
 	int i, ano;
-	char marca[50], modelo[75], cnh[15], placa[10];
-	int state = 0;
+	char placa[10], marca[50], modelo[75];
 
-	
-	// Verifica se existe espaÃ§o e aloca caso nÃ£o tenha
+	// Verifica se existe espaço e aloca caso não tenha
 	if (*qnt_max_veiculo - *qnt_veiculo <= 10){
 		reallocSizeVeiculo(veiculo, *qnt_max_veiculo + 20);
 		(*qnt_max_veiculo) = (*qnt_max_veiculo) + 20;
 	}
-
-	printf("\nFoi atÃ© aqui\n");
 
 	// Verifica o index a ser cadastrado
 	for (i=0; i<*qnt_veiculo; i++){
@@ -29,45 +27,50 @@ void cadastrarVeiculo(struct veiculos veiculo[], int *qnt_veiculo, int *qnt_max_
 	}
 
 	// Obtem a placa
-	printf("Insira a placa do veÃ­culo (sem hÃ­fen): ");
+	printf("Insira a placa (sem hífen): ");
 	fflush(stdin);
 	gets(placa);
-	// Verifica a existÃªncia do veiculo
+	// Verifica a existência do veiculo
 	if (verifyExistVeiculo(veiculo, placa, *qnt_veiculo) == 1){
-		printf("VeÃ­culo ja cadastrado");
+		clearScreen();
+		printf("Veículo já cadastrado\n\n");
 	} else{
+		// Obtem os dados e cadastra
 		strcpy(veiculo[i].placa, placa);
-
-		printf("Insira o modelo: ");
-		gets(modelo);
-		strcpy(veiculo[i].modelo, modelo);
 
 		printf("Insira a marca: ");
 		gets(marca);
 		strcpy(veiculo[i].marca, marca);
+
+		printf("Insira o modelo: ");
+		gets(modelo);
+		strcpy(veiculo[i].modelo, modelo);
 		
 		printf("Insira o ano: ");
 		scanf("%d", &veiculo[i].ano);
 
-		veiculo[i].state = 0;
+		veiculo[i].state = 1;
+		strcpy(veiculo[i].cpfAluguel, "0");
 
 		(*qnt_veiculo)++;
 
 		clearScreen();
-		printf("\n\nVeÃ­culo cadastrado com sucesso\n\n");
+		printf("\n\nVeículo cadastrado com sucesso\n\n");
 	}
 }
 
+// Função para excluir um veículo
 void excluirVeiculo(struct veiculos veiculo[], int *qnt_veiculo, int *qnt_max_veiculo, int *qnt_veiculo_excluido){
 	int i;
 	int found = 0;
 	char placa[10], conf;
 
-	printf("Insira a placa do veiculo a ser excluido: ");
+	// Obtem a placa
+	printf("Insira a placa do veículo a ser excluído: ");
 	fflush(stdin);
 	gets(placa);
 
-	// Verifica a existÃªncia do cliente
+	// Verifica a existência do veiculo
 	for (i=0; i<*qnt_veiculo; i++){
 		if (strcmp(veiculo[i].placa, placa) == 0){
 			found = 1;
@@ -76,34 +79,38 @@ void excluirVeiculo(struct veiculos veiculo[], int *qnt_veiculo, int *qnt_max_ve
 	}
 
 	if (found == 0){
+		// Veículo não encontrado
 		clearScreen();
-		printf("VeÃ­culo nÃ£o encontrado\n\n");
+		printf("Veiculo não encontrado\n\n");
 	}  else{
-		printf("Tem certeja que deseja excluir o veÃ­culo de placa %s (S/N): ", veiculo[i].placa);
+		// Confirmação de exclusão
+		printf("Tem certeja que deseja excluir o veículo de placa %s (S/N): ", veiculo[i].placa);
 		scanf(" %c", &conf);
 		clearScreen();
 		
 		if (conf == 'S'){
 			strcpy(veiculo[i].placa, "0");
-			printf("\n\nCliente excluido com sucesso\n\n");
+			printf("\n\nVeículo excluído com sucesso\n\n");
 			(*qnt_veiculo)--; 
 			(*qnt_veiculo_excluido)++;
 		} else{
-			printf("\n\nOperaÃ§Ã£o cancelada\n\n");
+			printf("\n\nOperação cancelada\n\n");
 		}
 	}
 }
 
-void consultarVeiculo(struct veiculos veiculo[], int *qnt_veiculo, int *qnt_max_veiculo, int *qnt_veiculo_excluido){
-	int i;
+// Função para consultar um veículo
+void consultarVeiculo(struct veiculos veiculo[], int *qnt_veiculo, int *qnt_max_veiculo, int *qnt_cliente, int *qnt_max_cliente, struct clientes cliente[]){
+	int i, j;
 	int found = 0;
 	char placa[10];
 
-	printf("Insira a placa do veÃ­culo a ser consultado: ");
+	// Obtem a placa
+	printf("Insira a placa do veículo a ser exibido: ");
 	fflush(stdin);
 	gets(placa);
 
-	// Verifica a existÃªncia do veÃ­culo
+	// Verifica a existência do veículo
 	for (i=0; i<*qnt_veiculo; i++){
 		if (strcmp(veiculo[i].placa, placa) == 0){
 			found = 1;
@@ -113,38 +120,45 @@ void consultarVeiculo(struct veiculos veiculo[], int *qnt_veiculo, int *qnt_max_
 
 	if (found == 0){
 		clearScreen();
-		printf("Cliente nÃ£o encontrado\n\n");
+		printf("Veículo não encontrado\n\n");
 	}  else{
+		printf("\n\nMarca: %s\n", veiculo[i].marca);
 		printf("Modelo: %s\n", veiculo[i].modelo);
-		printf("Marca: %s\n", veiculo[i].marca);
 		printf("Ano: %d\n", veiculo[i].ano);
 		printf("Placa: %s\n", veiculo[i].placa);
-		printf("Estado atual: ");
 		if (veiculo[i].state == 1){
-			printf("Alugado\n\n");
+			printf("Estado: Disponível\n\n");
 		} else{
-			printf("DisponÃ­vel\n\n");
+			printf("Estado: Alugado\n");
+			printf("\nDados do Contratante:\n");
+			for (j=0; j<*qnt_cliente; j++){
+				if (strcmp(cliente[j].cpf, veiculo[i].cpfAluguel) == 0){
+					printf("Nome: %s\n", cliente[j].name);
+					printf("CPF: %s\n", cliente[j].cpf);
+					printf("CNH: %s\n", cliente[j].cnh);
+					printf("Telefone: %s\n\n", cliente[j].telefone);
+					break;
+				}
+			}
 		}
 	}
 }
 
-void listarVeiculo(struct veiculos veiculo[], int *qnt_veiculo, int *qnt_max_veiculo, int *qnt_veiculo_excluido){
-	int i, contExibido;
-	contExibido = 0;
+// Função para listar todos os veículos
+void listarVeiculo(struct veiculos veiculo[], int *qnt_veiculo){
+	int i;
 	clearScreen();
-	printf("\n\n%d\n\n", *qnt_veiculo);
 
-	for (i=0; i<(*qnt_veiculo+ *qnt_veiculo_excluido); i++){
+	for (i=0; i<(*qnt_veiculo); i++){
 		if (strlen(veiculo[i].placa) > 2){
-			printf("Modelo: %s\n", veiculo[i].modelo);
 			printf("Marca: %s\n", veiculo[i].marca);
+			printf("Modelo: %s\n", veiculo[i].modelo);
 			printf("Ano: %d\n", veiculo[i].ano);
 			printf("Placa: %s\n", veiculo[i].placa);
-			printf("Estado atual: ");
 			if (veiculo[i].state == 1){
-				printf("Alugado\n\n");
+				printf("Estado: Disponível\n\n");
 			} else{
-				printf("DisponÃ­vel\n\n");
+				printf("Estado: Alugado pelo cliente de CPF: %s\n\n", veiculo[i].cpfAluguel);
 			}
 		}
 	}

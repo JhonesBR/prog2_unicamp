@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <string.h>
+#include <ctype.h>
 #include "locadora.h"
 #include "locacao.h"
 #include "cliente.h"
@@ -9,31 +10,33 @@
 
 int main() {
 	setlocale(LC_ALL, "Portuguese");
-	int escolha1, escolha2, qnt_cliente, qnt_veiculo, qnt_max_cliente, qnt_cliente_excluido, qnt_max_veiculo, qnt_veiculo_excluido;
-	escolha1 = escolha2 = qnt_cliente = qnt_veiculo = qnt_cliente_excluido = qnt_veiculo_excluido = 0;
+	int escolha1, escolha2, qnt_cliente, qnt_max_cliente, qnt_cliente_excluido, qnt_veiculo, qnt_max_veiculo, qnt_veiculo_excluido, qnt_locacao, qnt_max_locacao, conf;
+	escolha1 = escolha2 = qnt_cliente = qnt_cliente_excluido = qnt_veiculo = qnt_veiculo_excluido = qnt_locacao = qnt_max_locacao = 0;
 	qnt_max_cliente = qnt_max_veiculo = 100;
 	
 	struct clientes* cliente;
     cliente = (struct clientes*) malloc(100*sizeof(struct clientes));
 	struct veiculos* veiculo;
-    veiculo = (struct veiculos*) malloc(100*sizeof(struct veiculos));
-	
+	veiculo = (struct veiculos*) malloc(100*sizeof(struct veiculos));
+	struct locacoes* locacao;
+	locacao = (struct locacoes*) malloc(100*sizeof(struct locacoes));
+
 	clearScreen();
 	for(;escolha1 != 4;){
-		printf("1 - Clientes (A FAZER)\n");
-		printf("2 - Locaï¿½ï¿½o (A FAZER)\n");
-		printf("3 - Veï¿½culos (A FAZER)\n");
-		printf("4 - Sair (A FAZER)\n");
+		printf("1 - Clientes\n");
+		printf("2 - Locação\n");
+		printf("3 - Veículos\n");
+		printf("4 - Sair\n");
 		scanf("%d", &escolha1);
 		clearScreen();
 
 		switch(escolha1){
 			case 1:
-			printf("1. Novo cliente (FEITO)\n");
-			printf("2. Editar cadastro (FEITO)\n");
-			printf("3. Excluir cadastro (FEITO)\n");
-			printf("4. Consulta de cliente (A FAZER)\n");
-			printf("5. Listagem de clientes (FEITO)\n");
+			printf("1. Novo cliente\n");
+			printf("2. Editar cadastro\n");
+			printf("3. Excluir cadastro\n");
+			printf("4. Consulta de cliente\n");
+			printf("5. Listagem de clientes\n");
 			printf("6. Voltar\n");
 			scanf("%d", &escolha2);
 			clearScreen();
@@ -48,6 +51,7 @@ int main() {
 				
 				case 3:
 					excluirCliente(cliente, &qnt_cliente, &qnt_max_cliente, &qnt_cliente_excluido);
+					organizeListCliente(cliente, qnt_cliente, &qnt_cliente_excluido);
 				break;
 				
 				case 4:
@@ -55,7 +59,7 @@ int main() {
 				break;
 				
 				case 5:
-					listarCliente(cliente, &qnt_cliente, &qnt_max_cliente, &qnt_cliente_excluido);
+					listarCliente(cliente, &qnt_cliente);
 				break;
 				
 				case 6:
@@ -67,23 +71,23 @@ int main() {
 			break;
 
 			case 2:
-			printf("1. Locaï¿½ï¿½o de veï¿½culo (A FAZER)\n");
-			printf("2. Devoluï¿½ï¿½o de veï¿½culo (A FAZER)\n");
-			printf("3. Relatï¿½rio de locaï¿½ï¿½es (A FAZER)\n");
+			printf("1. Locação de veículo \n");
+			printf("2. Devolução de veículo\n");
+			printf("3. Relatório de locações\n");
 			printf("4. Voltar\n");
 			scanf("%d", &escolha2);
 			clearScreen();
 			switch(escolha2){
 				case 1:
-					locacaoVeiculo();
+					locacaoVeiculo(cliente, veiculo, locacao, &qnt_cliente, &qnt_veiculo, &qnt_locacao, &qnt_max_locacao);
 				break;
 				
 				case 2:
-					devolucaoVeiculo();
+					devolucaoVeiculo(cliente, veiculo, locacao, &qnt_cliente, &qnt_veiculo, &qnt_locacao, &qnt_max_locacao);
 				break;
 				
 				case 3:
-					relatorioLocacao();
+					relatorioLocacao(locacao, &qnt_locacao);
 				break;
 				
 				case 4:
@@ -95,28 +99,29 @@ int main() {
 			break;
 
 			case 3:
-			printf("1. Cadastrar veï¿½culo (A FAZER)\n");
-			printf("2. Excluir cadastro de veï¿½ulo (A FAZER)\n");
-			printf("3. Consulta de cadastro de veï¿½culo (A FAZER)\n");
-			printf("4. Listagem de frota (A FAZER)\n");
+			printf("1. Cadastrar veículo\n");
+			printf("2. Excluir cadastro de veíulo\n");
+			printf("3. Consulta de veículo\n");
+			printf("4. Listagem de frota\n");
 			printf("5. Voltar\n");
 			scanf("%d", &escolha2);
 			clearScreen();
 			switch(escolha2){
 				case 1:
-					cadastrarVeiculo(veiculo, qnt_veiculo, qnt_max_veiculo);
+					novoVeiculo(veiculo, &qnt_veiculo, &qnt_max_veiculo);
 				break;
-				
+					
 				case 2:
-					excluirVeiculo(veiculo, qnt_veiculo, qnt_max_veiculo, qnt_veiculo_excluido);
+					excluirVeiculo(veiculo, &qnt_veiculo, &qnt_max_veiculo, &qnt_veiculo_excluido);
+					organizeListVeiculo(veiculo, qnt_veiculo, &qnt_veiculo_excluido);
 				break;
 				
 				case 3:
-					consultarVeiculo(veiculo, qnt_veiculo, qnt_max_veiculo, qnt_veiculo_excluido);
+					consultarVeiculo(veiculo, &qnt_veiculo, &qnt_max_veiculo, &qnt_cliente, &qnt_max_cliente, cliente);	
 				break;
 				
 				case 4:
-					listarVeiculo(veiculo, qnt_veiculo, qnt_max_veiculo, qnt_veiculo_excluido);
+					listarVeiculo(veiculo, &qnt_veiculo);
 				break;
 				
 				case 5:
@@ -128,6 +133,15 @@ int main() {
 			break;
 
 			case 4:
+				clearScreen();
+				printf("Tem certeja que deseja finalizar o programa (S/N): ");
+				scanf(" %c", &conf);
+				clearScreen();
+				if (conf == 'S'){
+					break;
+				} else{
+					escolha1 = 0;
+				}
 			break;
 
 			default:
