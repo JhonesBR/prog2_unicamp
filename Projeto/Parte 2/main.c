@@ -2,18 +2,20 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <string.h>
-#include <ctype.h>
 #include "locadora.h"
 #include "locacao.h"
 #include "cliente.h"
 #include "veiculo.h"
 
-int main() {
+int main(){
 	setlocale(LC_ALL, "Portuguese");
+	
+	// Declaração inicial de variáveis
 	int escolha1, escolha2, qnt_cliente, qnt_max_cliente, qnt_cliente_excluido, qnt_veiculo, qnt_max_veiculo, qnt_veiculo_excluido, qnt_locacao, qnt_max_locacao, conf;
 	escolha1 = escolha2 = qnt_cliente = qnt_cliente_excluido = qnt_veiculo = qnt_veiculo_excluido = qnt_locacao = qnt_max_locacao = 0;
 	qnt_max_cliente = qnt_max_veiculo = 100;
 	
+	// Inicialização das structs utilizadas
 	struct clientes* cliente;
     cliente = (struct clientes*) malloc(100*sizeof(struct clientes));
 	struct veiculos* veiculo;
@@ -21,6 +23,7 @@ int main() {
 	struct locacoes* locacao;
 	locacao = (struct locacoes*) malloc(100*sizeof(struct locacoes));
 
+	// Menus e submenus
 	clearScreen();
 	for(;escolha1 != 4;){
 		printf("1 - Clientes\n");
@@ -55,7 +58,7 @@ int main() {
 				break;
 				
 				case 4:
-					consultarCliente(cliente, &qnt_cliente, &qnt_max_cliente, &qnt_cliente_excluido, &qnt_veiculo, &qnt_max_veiculo);
+					consultarCliente(cliente, veiculo, &qnt_cliente, &qnt_max_cliente, &qnt_veiculo, &qnt_max_veiculo);
 				break;
 				
 				case 5:
