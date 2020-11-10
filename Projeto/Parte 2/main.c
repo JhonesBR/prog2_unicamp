@@ -149,6 +149,15 @@ int main(){
 
 			default:
 				escolha1 = 4;
+				clearScreen();
+				printf("Tem certeja que deseja finalizar o programa (S/N): ");
+				scanf(" %c", &conf);
+				clearScreen();
+				if (conf == 'S'){
+					break;
+				} else{
+					escolha1 = 0;
+				}
 			break;
 		}
 	}
