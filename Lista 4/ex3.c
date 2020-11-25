@@ -5,7 +5,7 @@
 
 struct pacientes{
     char nome[100];
-    long int telefone;
+    long long int telefone;
     char tipoSanguineo[5];
 };
 
@@ -28,7 +28,7 @@ int main(){
 	        	fread(&b, sizeof(struct pacientes), 1, data);
        		if (feof(data)){
           		printf("Digite o telefone do paciente: ");
-          		scanf("%ld", &a.telefone);
+          		scanf("%lld", &a.telefone);
           		printf("Digite o tipo sanguineo do paciente: ");
                 fflush(stdin);
           		gets(a.tipoSanguineo);

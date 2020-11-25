@@ -3,7 +3,7 @@
 
 int main(){
     char nome[100], tipoSanguineo[5];
-    long int telefone;
+    long long int telefone;
     FILE *data;
 
     data = fopen("dados.txt", "w+");
@@ -12,12 +12,12 @@ int main(){
         printf("Insira o nome: ");
         gets(nome);
         printf("Insira o telefone: ");
-        scanf("%ld", &telefone);
+        scanf("%lld", &telefone);
         fflush(stdin);
         printf("Insira o tipo sanguíneo: ");
         gets(tipoSanguineo);
 
-        fprintf(data, "%s,%ld,%s", nome, telefone, tipoSanguineo);
+        fprintf(data, "%s,%lld,%s", nome, telefone, tipoSanguineo);
         printf("\nDados armazenados em dados.txt\n");
     } else{
         printf("Falha em abrir o arquivo dados.txt\n");
